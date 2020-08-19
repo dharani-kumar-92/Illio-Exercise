@@ -1,8 +1,10 @@
-package com.dharani.Service;
+package com.project.Service;
 
-import com.dharani.Model.Data;
+import com.project.Model.Data;
+import com.project.Repo.DataRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -16,7 +18,10 @@ import java.net.URL;
 import java.util.*;
 
 @Service
-public class HistoricalDataURL implements DataSource {
+public class Dataservice {
+
+    @Autowired
+    private DataRepository dataRepository;
 
     @Value("${base_url}")
     private String base_url;
@@ -32,8 +37,8 @@ public class HistoricalDataURL implements DataSource {
 
     public String createURL(String from,String to,String ticker){
         MultiValueMap<String, String> queryParams = new LinkedMultiValueMap<>();
-        from="2019-01-01";
-        to="2019-12-01";
+//        from="2019-01-01";
+//        to="2019-12-01";
         ticker= "AAPL.US";
         queryParams.add("api_token",api_token);
         queryParams.add("period",period);
@@ -46,9 +51,24 @@ public class HistoricalDataURL implements DataSource {
         return uriBuilder.toUriString();
     }
 
-    public OptionalDouble getAverageRange(String start, String end, String ticker){
+    public String getData(String start, String end, String ticker){
         String urlInfo = createURL(start, end, ticker);
         List<Data> pricesBetween = getResponseFromURL(urlInfo);
+        dataRepository.saveAll(pricesBetween);
+        return "Success";
+    }
+
+    public String deleteRepo(){
+        dataRepository.deleteAll();
+        return "Success";
+    }
+    
+    public List<Data> queryDatabase(){
+        return (List<Data>) dataRepository.findAll();
+    }
+
+    public OptionalDouble getAverageRange(){
+        List<Data> pricesBetween = (List<Data>) dataRepository.findAll();
         List<Double> averages = new ArrayList<>();
         //Using OHLC per day
         Iterator<Data> iter = pricesBetween.iterator();
