@@ -1,12 +1,37 @@
-package com.dharani.Model;
+package com.project.Model;
 
-public class Data {
+import javax.persistence.*;
+import java.io.Serializable;
+
+@Entity
+@Table(name = "data")
+public class Data implements Serializable {
+
+    private static final long serialVersionUID = -2343243243242432341L;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
+
+    @Column(name = "date")
     String date;
+
+    @Column(name = "open")
     double open;
+
+    @Column(name = "high")
     double high;
+
+    @Column(name = "low")
     double low;
+
+    @Column(name = "close")
     double close;
+
+    @Column(name = "adjusted_close")
     double adjusted_close;
+
+    @Column(name = "volume")
     Integer volume;
 
     public String getDate() {
